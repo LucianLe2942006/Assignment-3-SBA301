@@ -1,3 +1,7 @@
+/**
+ * Student Name: Lê Nhựt Huy
+ * Student ID  : CE200376
+ */
 package com.lenhuthuy.fuminihotel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
