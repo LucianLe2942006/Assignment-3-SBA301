@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { customerService } from "../services/customerService";
+import { systemService } from "../services/systemService";
 
 function SettingsPage({ currentUser, onUserUpdated }) {
   const isCustomer = currentUser?.role === "CUSTOMER";
@@ -12,6 +13,7 @@ function SettingsPage({ currentUser, onUserUpdated }) {
     password: ""
   });
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -64,15 +66,29 @@ function SettingsPage({ currentUser, onUserUpdated }) {
     }
   };
 
+  const handleResetDatabase = async () => {
+    try {
+      setResetting(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+      const res = await systemService.resetDatabase();
+      setSuccessMessage(res.message || "Database reset to default seed data.");
+    } catch (err) {
+      setErrorMessage(err.message || "Failed to reset database.");
+    } finally {
+      setResetting(false);
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h2>{isCustomer ? "My Profile" : "System Information"}</h2>
+          <h2>{isCustomer ? "My Profile & Settings" : "System Information"}</h2>
           <p className="page-subtitle">
             {isCustomer
               ? "Manage your personal customer profile information"
-              : "View current authenticated session details"}
+              : "View current authenticated session details and reset seed data"}
           </p>
         </div>
       </div>
@@ -195,6 +211,21 @@ function SettingsPage({ currentUser, onUserUpdated }) {
             </div>
           </div>
         )}
+
+        <div className="settings-card">
+          <h3>Database Seed Reset</h3>
+          <p className="settings-description">
+            Restore all RoomTypes, RoomInformation, Customers, BookingReservations, and BookingDetails to default seed data.
+          </p>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={handleResetDatabase}
+            disabled={resetting}
+          >
+            {resetting ? "Resetting..." : "Reset Database to Default Seed Data"}
+          </button>
+        </div>
       </div>
     </div>
   );
